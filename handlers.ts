@@ -174,9 +174,8 @@ function getIndexHtml(sessions) {
 }
 
 export async function indexHandler() {
-  // TODO: New OT_TOKEN for new origin
   const OT_TOKEN =
-	"AiI/4WLmjyjhdfpU9qMdvoHgic0Wu1hO4S9q/XfmRZ48njVna0ljcPeG5Fjyru3gjq4No76ENU6YF7szchas4QYAAAB2eyJvcmlnaW4iOiJodHRwczovL2Ric2MtcHJvdG90eXBlLXNlcnZlci5nbGl0Y2gubWU6NDQzIiwiZmVhdHVyZSI6IkRldmljZUJvdW5kU2Vzc2lvbkNyZWRlbnRpYWxzIiwiZXhwaXJ5IjoxNzYwNDAwMDAwfQ==";
+	"AjK0oI6hwEUQox3uAUmvnef0buvQZ8svmzzwQlvYc/h9ccdrGJR4feFwkqC/+TooPuAY9u7E/3yBBeMmtBarCQ4AAAB4eyJvcmlnaW4iOiJodHRwczovL2RydWJlcnktZGJzYy10ZXN0LXNlcnZlci5kZW5vLmRldjo0NDMiLCJmZWF0dXJlIjoiRGV2aWNlQm91bmRTZXNzaW9uQ3JlZGVudGlhbHMiLCJleHBpcnkiOjE3NjA0MDAwMDB9";
   const sessions = await getAllSessions();
   return new Response(getIndexHtml(sessions), {
     headers: { "content-type": "text/html", "origin-trial": OT_TOKEN },
