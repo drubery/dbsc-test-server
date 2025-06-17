@@ -14,7 +14,7 @@ Deno.cron(
   cleanupExpiredSessions,
 );
 
-Deno.serve({ port: 8888 }, async (request) => {
+Deno.serve(async (request) => {
   const url = new URL(request.url);
   console.log((new Date()).toISOString(), ": request to", url.href);
   if (url.pathname == "/") {

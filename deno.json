@@ -1,0 +1,14 @@
+{
+  "unstable": [
+    "kv",
+    "cron"
+  ],
+  "deploy": {
+    "project": "363643a7-8f2d-4083-90f3-05a74163e607",
+    "exclude": [
+      "**/node_modules"
+    ],
+    "include": [],
+    "entrypoint": "main.ts"
+  }
+}

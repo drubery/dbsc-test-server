@@ -10,9 +10,6 @@ import {
   setSessionData,
 } from "./db.ts";
 
-const OT_TOKEN =
-  "AiI/4WLmjyjhdfpU9qMdvoHgic0Wu1hO4S9q/XfmRZ48njVna0ljcPeG5Fjyru3gjq4No76ENU6YF7szchas4QYAAAB2eyJvcmlnaW4iOiJodHRwczovL2Ric2MtcHJvdG90eXBlLXNlcnZlci5nbGl0Y2gubWU6NDQzIiwiZmVhdHVyZSI6IkRldmljZUJvdW5kU2Vzc2lvbkNyZWRlbnRpYWxzIiwiZXhwaXJ5IjoxNzYwNDAwMDAwfQ==";
-
 function getNewChallenge() {
   let challenge = "";
   let alphabet = "abcdefghijklmnopqrstuvwxyz";
@@ -177,6 +174,9 @@ function getIndexHtml(sessions) {
 }
 
 export async function indexHandler() {
+  // TODO: New OT_TOKEN for new origin
+  const OT_TOKEN =
+	"AiI/4WLmjyjhdfpU9qMdvoHgic0Wu1hO4S9q/XfmRZ48njVna0ljcPeG5Fjyru3gjq4No76ENU6YF7szchas4QYAAAB2eyJvcmlnaW4iOiJodHRwczovL2Ric2MtcHJvdG90eXBlLXNlcnZlci5nbGl0Y2gubWU6NDQzIiwiZmVhdHVyZSI6IkRldmljZUJvdW5kU2Vzc2lvbkNyZWRlbnRpYWxzIiwiZXhwaXJ5IjoxNzYwNDAwMDAwfQ==";
   const sessions = await getAllSessions();
   return new Response(getIndexHtml(sessions), {
     headers: { "content-type": "text/html", "origin-trial": OT_TOKEN },
@@ -358,7 +358,7 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
   // Clear the last challenge so we challenge next time.
   session_data.lastChallenge = null;
 
-  setSessionData(session_id, session_data);
+  await setSessionData(session_id, session_data);
 
   const response_cookie = session_data.cookie;
   const response_cookie_header =
@@ -376,7 +376,6 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
 
 export async function deleteSessionHandler(request) {
   const form = await request.formData();
-  console.log(form);
   if (form.get("id")) {
     await deleteSessionData(form.get("id"));
   }
