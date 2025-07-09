@@ -219,7 +219,7 @@ export async function startSessionFormHandler(request) {
       value: form.get("cvalue"),
       lifetime: form.get("cexpire"),
     },
-    expires: Date.now() + 60 * 1000,
+    expires: Date.now() + 60 * 60 * 1000,
   };
 
   setSessionData(id, session_data);
@@ -236,7 +236,7 @@ export async function startSessionFormHandler(request) {
       "location": "/",
       "sec-session-registration": registration_header,
       "set-cookie":
-        `dbsc-registration-sessions-id=${id}; Domain=${url.hostname}; Path=/`,
+        `dbsc-registration-sessions-id=${id}; Domain=${url.hostname}; Path=/; Max-Age=3600000`,
     },
   });
 }
