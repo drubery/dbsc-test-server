@@ -4,7 +4,9 @@ export async function getAllSessions() {
   const entries = await db.list({ prefix: [] });
   let sessions = [];
   for await (const entry of entries) {
-    sessions.push(entry.value);
+    if (Date.now() <= entry.value.expires) {
+      sessions.push(entry.value);
+    }
   }
   return sessions;
 }
@@ -18,7 +20,11 @@ export async function getNewSessionId() {
 }
 
 export async function getSessionData(id) {
-  return (await db.get([id])).value;
+  let session = (await db.get([id])).value;
+  if (session != null && Date.now() > session.expires) {
+    return null;
+  }
+  return session;
 }
 
 export async function setSessionData(id, data) {
@@ -41,10 +47,8 @@ export async function clearAllData() {
 export async function cleanupExpiredSessions() {
   const entries = db.list({ prefix: [] });
   for await (const entry of entries) {
-    const session_id = entry.key[0];
-    const session_data = await getSessionData(session_id);
-    if (Date.now() > session_data.expires) {
-      deleteSessionData(session_id);
+    if (Date.now() > entry.value.expires) {
+      deleteSessionData(entry.key[0]);
     }
   }
 }
