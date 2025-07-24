@@ -103,11 +103,11 @@ function getIndexHtml(sessions) {
             <table>
               <tr>
                 <td align="right"><label for="cinclude">Cookie scope include:</label></td>
-                <td><input id="cinclude" name="cinclude" required="required" type="text" value="trusted/" style="text-align:right;"/></td>
+                <td><input id="cinclude" name="cinclude" required="required" type="text" value="/trusted" style="text-align:right;"/></td>
               </tr>
               <tr>
                 <td align="right"><label for="cexclude">Cookie scope exclude:</label></td>
-                <td><input id="cexclude" name="cexclude" required="required" type="text" value="untrusted/" style="text-align:right;"/></td>
+                <td><input id="cexclude" name="cexclude" required="required" type="text" value="/untrusted" style="text-align:right;"/></td>
               </tr>
               <tr>
                 <td align="right"><label for="authCode">Authorization Code:</label></td>
@@ -184,7 +184,6 @@ export async function indexHandler() {
 export async function startSessionFormHandler(request) {
   const form = await request.formData();
   const url = new URL(request.url);
-  const host = request.headers.get("host");
 
   let id = await getNewSessionId();
   let session_config = {
@@ -192,10 +191,10 @@ export async function startSessionFormHandler(request) {
     "refresh_url": "/internal/RefreshSession",
     "scope": {
       "origin": url.origin,
-      "include_site": true,
+      "include_site": false,
       "scope_specification": [
-        { "type": "include", "domain": url.host, "path": form.get("cinclude") },
-        { "type": "exclude", "domain": url.host, "path": form.get("cexclude") },
+        { "type": "include", "domain": url.hostname, "path": form.get("cinclude") },
+        { "type": "exclude", "domain": url.hostname, "path": form.get("cexclude") },
       ],
     },
     "credentials": [
@@ -203,7 +202,7 @@ export async function startSessionFormHandler(request) {
         "type": "cookie",
         "name": form.get("cname"),
         "attributes":
-          `Domain=${url.hostname}; Path=/; Max-Age=${form.cexpire}; SameSite=Strict;`,
+          `Domain=${url.hostname}; Path=/; SameSite=Strict;`,
       },
     ],
   };
