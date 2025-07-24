@@ -24,7 +24,6 @@ function getIndexHtml(sessions) {
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="https://glitch.com/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>DBSC prototype</title>
     <style>
