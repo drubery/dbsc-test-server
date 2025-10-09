@@ -232,7 +232,7 @@ export async function startSessionFormHandler(request) {
     status: 303,
     headers: {
       "location": "/",
-      "sec-session-registration": registration_header,
+      "secure-session-registration": registration_header,
       "set-cookie":
         `dbsc-registration-sessions-id=${id}; Domain=${url.hostname}; Path=/; Max-Age=3600000`,
     },
@@ -252,7 +252,7 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
       }
     }
   } else {
-    session_id = request.headers.get("sec-session-id");
+    session_id = request.headers.get("sec-secure-session-id");
   }
 
   if (!session_id) {
@@ -289,17 +289,17 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
     session_data.lastChallenge = getNewChallenge();
     setSessionData(session_id, session_data);
     return new Response("", {
-      status: 401,
+      status: 403,
       headers: {
         "content-type": "text/html",
-        "sec-session-challenge": `"${session_data.lastChallenge}"`,
+        "secure-session-challenge": `"${session_data.lastChallenge}";id="${session_id}"`,
       },
     });
   }
 
-  let registration_response = request.headers.get("sec-session-response");
+  let registration_response = request.headers.get("secure-session-response");
   if (!registration_response) {
-    console.log("Failed registration: no sec-session-response");
+    console.log("Failed registration: no secure-session-response");
     return new Response("", {
       status: 404,
       headers: { "content-type": "text/html" },
@@ -308,9 +308,11 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
 
   let decoded;
   try {
-    const decoder = createDecoder();
-    const payload = decoder(registration_response);
-    if (!payload.key) {
+    const decoder = createDecoder({ complete: true });
+    const sections = decoder(registration_response);
+    const header = sections.header;
+    const payload = sections.payload;
+    if (is_registration && !header.jwk) {
       console.log("Failed registration: invalid key");
       return new Response("", {
         status: 401,
@@ -319,7 +321,7 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
     }
 
     if (is_registration) {
-      session_data.key = jwkToPem(payload.key);
+      session_data.key = jwkToPem(header.jwk);
     }
 
     let verifier = createVerifier({ key: session_data.key });
