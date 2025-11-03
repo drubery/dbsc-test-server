@@ -220,7 +220,7 @@ export async function startSessionFormHandler(request) {
     expires: Date.now() + 60 * 60 * 1000,
   };
 
-  setSessionData(id, session_data);
+  await setSessionData(id, session_data);
 
   let registration_header =
     `(ES256 RS256); path="/internal/StartSession"; challenge="${session_data.lastChallenge}"`;
@@ -287,7 +287,7 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
   if (session_data.lastChallenge == null) {
     console.log("Challenging registration: no last challenge");
     session_data.lastChallenge = getNewChallenge();
-    setSessionData(session_id, session_data);
+    await setSessionData(session_id, session_data);
     return new Response("", {
       status: 403,
       headers: {
