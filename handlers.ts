@@ -1,5 +1,6 @@
 import { createDecoder, createVerifier } from "npm:fast-jwt";
 import jwkToPem from "npm:jwk-to-pem";
+import { escape } from "@std/html/entities";
 import {
   cleanupExpiredSessions,
   clearAllData,
@@ -147,8 +148,8 @@ function getIndexHtml(sessions) {
       sessions.map((session) =>
         `<tr>
                     <td>${session.config.session_identifier}</td>
-                    <td>${session.cookie.name}</td>
-                    <td>${session.cookie.value}</td>
+                    <td>${escape(session.cookie.name)}</td>
+                    <td>${escape(session.cookie.value)}</td>
 		    <td>${session.cookie.lifetime}</td>
                     <td>${session.hasEverRefreshed}</td>
                     <td><button
@@ -185,6 +186,30 @@ export async function startSessionFormHandler(request) {
   const form = await request.formData();
   const url = new URL(request.url);
 
+  const cinclude = form.get("cinclude");
+  const cexclude = form.get("cexclude");
+  const authCode = form.get("authCode") || undefined; // optional field
+  const cname = form.get("cname");
+  const cvalue = form.get("cvalue");
+  const cexpire = form.get("cexpire");
+
+  if (!cinclude || !cexclude || !cname || !cvalue || !cexpire) {
+    console.log("Failed registration: missing required form fields");
+    return new Response("", {
+      status: 400,
+      headers: { "content-type": "text/html" },
+    });
+  }
+
+  const lifetime = Number(cexpire);
+  if (isNaN(lifetime)) {
+    console.log("Failed registration: cookie expiration must be a number");
+    return new Response("", {
+      status: 400,
+      headers: { "content-type": "text/html" },
+    });
+  }
+
   let id = await getNewSessionId();
   let session_config = {
     "session_identifier": id,
@@ -193,14 +218,14 @@ export async function startSessionFormHandler(request) {
       "origin": url.origin,
       "include_site": false,
       "scope_specification": [
-        { "type": "include", "domain": url.hostname, "path": form.get("cinclude") },
-        { "type": "exclude", "domain": url.hostname, "path": form.get("cexclude") },
+        { "type": "include", "domain": url.hostname, "path": cinclude },
+        { "type": "exclude", "domain": url.hostname, "path": cexclude },
       ],
     },
     "credentials": [
       {
         "type": "cookie",
-        "name": form.get("cname"),
+        "name": cname,
         "attributes":
           `Domain=${url.hostname}; Path=/; SameSite=Strict;`,
       },
@@ -211,11 +236,11 @@ export async function startSessionFormHandler(request) {
     key: null,
     lastChallenge: getNewChallenge(),
     hasEverRefreshed: false,
-    authorization: form.get("authCode"),
+    authorization: authCode,
     cookie: {
-      name: form.get("cname"),
-      value: form.get("cvalue"),
-      lifetime: form.get("cexpire"),
+      name: cname,
+      value: cvalue,
+      lifetime: lifetime,
     },
     expires: Date.now() + 60 * 60 * 1000,
   };
@@ -224,8 +249,8 @@ export async function startSessionFormHandler(request) {
 
   let registration_header =
     `(ES256 RS256); path="/internal/StartSession"; challenge="${session_data.lastChallenge}"`;
-  if (form.get("authCode")) {
-    registration_header += `; authorization="${form.get("authCode")}"`;
+  if (authCode) {
+    registration_header += `; authorization="${authCode}"`;
   }
 
   return new Response("", {
