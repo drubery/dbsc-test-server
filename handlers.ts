@@ -357,6 +357,10 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
   // Clear the last challenge so we challenge next time.
   session_data.lastChallenge = null;
 
+  if (!is_registration) {
+    session_data.hasEverRefreshed = true;
+  }
+
   await setSessionData(session_id, session_data);
 
   const response_cookie = session_data.cookie;
