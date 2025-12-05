@@ -159,7 +159,7 @@ function getIndexHtml(sessions) {
         </div>
 
         <div id="session-list" class="session-form">
-    ${
+	  ${
     sessions.length == 0 ? `<p>No sessions</p>` : `<form>
               <p>Current sessions</p>
               <table>
@@ -167,7 +167,7 @@ function getIndexHtml(sessions) {
                   <th>SessionId</th>
                   <th>CookieName</th>
                   <th>CookieValue</th>
-      <th>CookieLifetime</th>
+		  <th>CookieLifetime</th>
                   <th>CookieEverRefreshed</th>
                   <th>DeleteSession</th>
                 </tr>
@@ -177,7 +177,7 @@ function getIndexHtml(sessions) {
                     <td>${session.config.session_identifier}</td>
                     <td>${escape(session.cookie.name)}</td>
                     <td>${escape(session.cookie.value)}</td>
-        <td>${session.cookie.lifetime}</td>
+		    <td>${session.cookie.lifetime}</td>
                     <td>${session.hasEverRefreshed}</td>
                     <td><button
                         type="submit"
