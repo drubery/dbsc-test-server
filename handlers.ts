@@ -26,10 +26,36 @@ function getIndexHtml(sessions) {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <title>DBSC prototype</title>
     <style>
+      :root {
+        --bg-color: #FFE6F8;
+        --text-color: #000000;
+        --title-color: #2800FF;
+        --form-bg: #FFF3FC;
+        --input-bg: #FFFFFF;
+        --input-border: #000000;
+        --shadow-color: #9BE7D8;
+        --table-border: #dddddd;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg-color: #121212;
+          --text-color: #e0e0e0;
+          --title-color: #8c7dff;
+          --form-bg: #1e1e1e;
+          --input-bg: #2d2d2d;
+          --input-border: #555555;
+          --shadow-color: #2a5c53;
+          --table-border: #444444;
+        }
+      }
+
       body {
-        background-color: #FFE6F8;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s, color 0.3s;
       }
       .wrapper {
         min-height: 87vh;
@@ -47,7 +73,7 @@ function getIndexHtml(sessions) {
         font-size: 1.25rem;
       }
       .title {
-        color: #2800FF;
+        color: var(--title-color);
         font-style: normal;
         font-weight: bold;
         font-size: 100px;
@@ -55,39 +81,40 @@ function getIndexHtml(sessions) {
         margin: 2rem 0 0;
       }
       .session-form {
-	background-color: #FFF3FC;
-	padding: 6px;
-	border-radius: 8px;
-	margin: 20px;
+        background-color: var(--form-bg);
+        padding: 6px;
+        border-radius: 8px;
+        margin: 20px;
       }
       .session-form button {
-	margin-top: 8px;
-	margin-bottom: 8px;
+        margin-top: 8px;
+        margin-bottom: 8px;
       }
       button:hover {
-	cursor: pointer;
-	box-shadow: -8px 4px 20px #9BE7D8;
+        cursor: pointer;
+        box-shadow: -8px 4px 20px var(--shadow-color);
       }
       form {
-	margin: 0.75rem 0;
+        margin: 0.75rem 0;
       }
       button,
       input {
-	font-family: inherit;
-	font-size: 100%;
-	background: #FFFFFF;
-	border: 1px solid #000000;
-	box-sizing: border-box;
-	border-radius: 4px;
-	padding: 0.5rem 1rem;
+        font-family: inherit;
+        font-size: 100%;
+        background: var(--input-bg);
+        color: var(--text-color);
+        border: 1px solid var(--input-border);
+        box-sizing: border-box;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
       }
       label {
-	color: #000000;
-	font-weight: bold;
+        color: var(--text-color);
+        font-weight: bold;
       }
       #session-list td, #session-list th {
-	border: 1px solid #dddddd;
-	text-align: center;
+        border: 1px solid var(--table-border);
+        text-align: center;
       }
     </style>
   </head>
@@ -132,7 +159,7 @@ function getIndexHtml(sessions) {
         </div>
 
         <div id="session-list" class="session-form">
-	  ${
+    ${
     sessions.length == 0 ? `<p>No sessions</p>` : `<form>
               <p>Current sessions</p>
               <table>
@@ -140,7 +167,7 @@ function getIndexHtml(sessions) {
                   <th>SessionId</th>
                   <th>CookieName</th>
                   <th>CookieValue</th>
-		  <th>CookieLifetime</th>
+      <th>CookieLifetime</th>
                   <th>CookieEverRefreshed</th>
                   <th>DeleteSession</th>
                 </tr>
@@ -150,7 +177,7 @@ function getIndexHtml(sessions) {
                     <td>${session.config.session_identifier}</td>
                     <td>${escape(session.cookie.name)}</td>
                     <td>${escape(session.cookie.value)}</td>
-		    <td>${session.cookie.lifetime}</td>
+        <td>${session.cookie.lifetime}</td>
                     <td>${session.hasEverRefreshed}</td>
                     <td><button
                         type="submit"
