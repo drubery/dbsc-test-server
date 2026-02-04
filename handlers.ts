@@ -222,7 +222,7 @@ export async function startSessionFormHandler(request) {
 
   if (!cinclude || !cexclude || !cname || !cvalue || !cexpire) {
     console.log("Failed registration: missing required form fields");
-    return new Response("", {
+    return new Response("Failed registration: missing required form fields", {
       status: 400,
       headers: { "content-type": "text/html" },
     });
@@ -231,7 +231,7 @@ export async function startSessionFormHandler(request) {
   const lifetime = Number(cexpire);
   if (isNaN(lifetime)) {
     console.log("Failed registration: cookie expiration must be a number");
-    return new Response("", {
+    return new Response("Failed registration: cookie expiration must be a number", {
       status: 400,
       headers: { "content-type": "text/html" },
     });
@@ -309,7 +309,7 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
 
   if (!session_id) {
     console.log("Failed registration: no session id");
-    return new Response("", {
+    return new Response("Failed registration: no session id", {
       status: 404,
       headers: { "content-type": "text/html" },
     });
@@ -318,19 +318,19 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
   let session_data = await getSessionData(session_id);
   if (session_data == null) {
     console.log("Failed registration: invalid session id", session_id);
-    return new Response("", {
+    return new Response(`Failed registration: invalid session id: ${session_id}`, {
       status: 404,
       headers: { "content-type": "text/html" },
     });
   } else if (is_registration && session_data.key != null) {
     console.log("Failed registration: re-registration for", session_id);
-    return new Response("", {
+    return new Response(`Failed registration: re-registration for: ${session_id}`, {
       status: 404,
       headers: { "content-type": "text/html" },
     });
   } else if (!is_registration && session_data.key == null) {
     console.log("Failed registration: no key for", session_id);
-    return new Response("", {
+    return new Response(`Failed registration: no key for ${session_id}`, {
       status: 404,
       headers: { "content-type": "text/html" },
     });
@@ -340,7 +340,7 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
     console.log("Challenging registration: no last challenge");
     session_data.lastChallenge = getNewChallenge();
     await setSessionData(session_id, session_data);
-    return new Response("", {
+    return new Response("Challenging registration: no last challenge", {
       status: 403,
       headers: {
         "content-type": "text/html",
@@ -352,7 +352,7 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
   let registration_response = request.headers.get("secure-session-response");
   if (!registration_response) {
     console.log("Failed registration: no secure-session-response");
-    return new Response("", {
+    return new Response("Failed registration: no secure-session-response", {
       status: 404,
       headers: { "content-type": "text/html" },
     });
@@ -366,7 +366,7 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
     const payload = sections.payload;
     if (is_registration && !header.jwk) {
       console.log("Failed registration: invalid key");
-      return new Response("", {
+      return new Response("Failed registration: invalid key", {
         status: 401,
         headers: { "content-type": "text/html" },
       });
@@ -381,7 +381,7 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
   } catch (e) {
     console.log("Failed registration: invalid signature");
     console.log(e);
-    return new Response("", {
+    return new Response("Failed registration: invalid signature", {
       status: 401,
       headers: { "content-type": "text/html" },
     });
@@ -392,7 +392,7 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
     session_data.authorization !== decoded.authorization
   ) {
     console.log("Failed registration: invalid authorization");
-    return new Response("", {
+    return new Response("Failed registration: invalid authorization", {
       status: 401,
       headers: { "content-type": "text/html" },
     });
@@ -400,7 +400,7 @@ export async function startSessionAndRefreshHandler(request, is_registration) {
 
   if (session_data.lastChallenge !== decoded.jti) {
     console.log("Failed registration: invalid challenge");
-    return new Response("", {
+    return new Response("Failed registration: invalid challenge", {
       status: 401,
       headers: { "content-type": "text/html" },
     });
