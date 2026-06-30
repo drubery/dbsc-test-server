@@ -9,7 +9,9 @@
       "**/node_modules"
     ],
     "include": [],
-    "entrypoint": "main.ts"
+    "entrypoint": "main.ts",
+    "org": "dbsc-test-server",
+    "app": "serve"
   },
   "imports": {
     "@std/html": "jsr:@std/html@^1.0.5"
